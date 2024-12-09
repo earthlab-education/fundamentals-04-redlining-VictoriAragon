@@ -1,0 +1,92 @@
+#creating data directory folders for the elevation downloaded data using os and pathlib
+
+
+#make elevation data folder
+os.makedirs("C:/Users/arago/Documents/GitHub/habitatmodel-main/studyarea_data/elevation", exist_ok=True)
+
+#create variable with the path
+os.path.join("C:/Users/arago/Documents/GitHub/habitatmodel-main/studyarea_data/elevation")
+
+
+import earthaccess
+
+elevation_tif_data = r"C:/Users/arago/Documents/GitHub/habitatmodel-main/studyarea_data/elevation"
+#https://github.com/nsidc/earthaccess/
+
+#my profile site: https://urs.earthdata.nasa.gov/
+
+#DEM site search data: https://search.earthdata.nasa.gov/search
+
+# 1. Login
+earthaccess.login()
+
+# 2. Search
+results = earthaccess.search_data(
+    short_name='CIESIN_SEDAC_DEDC_ACE_V2',  # ATLAS/ICESat-2 L3A Land Ice Height
+    bounding_box=(pawnee_grasslands_bounds),  # Only include files in area of interest...
+    temporal=("1999-02", "2019-03"),  # ...and time period of interest.
+    count=10
+)
+
+# 3. Access
+files = earthaccess.download(results, elevation_tif_data)
+
+print(f"Downloaded: {elevation_tif_data}")
+
+
+datasets = earthaccess.search_datasets(keyword='ACE2')
+
+for dataset in datasets:
+    print(dataset['umm']['ShortName'], dataset['umm']['EntryTitle'])
+#copied from chatgpt because code was not working
+# Setting variables and identifying directories
+elev3sec_data = r"C:\Users\arago\Documents\GitHub\habitatmodel-main\studyarea_data\elevation"
+elev5min_data = r"C:\Users\arago\Documents\GitHub\habitatmodel-main\studyarea_data\elevation"
+elev9sec_data = r"C:\Users\arago\Documents\GitHub\habitatmodel-main\studyarea_data\elevation"
+elev30sec_data = r"C:\Users\arago\Documents\GitHub\habitatmodel-main\studyarea_data\elevation"
+
+elev3sec_file_name = "dedc-ace-v2_30N105W_3sec.zip"
+elev5min_file_name = "dedc-ace-v2_30N105W_5min.zip"
+elev9sec_file_name = "dedc-ace-v2_30N105W_9sec.zip"
+elev30sec_file_name = "dedc-ace-v2_30N105W_30sec.zip"
+
+# Defining extraction directories
+elev3sec_data_extract = r"C:\Users\arago\Documents\GitHub\habitatmodel-main\studyarea_data\elevation"
+elev5min_data_extract = r"C:\Users\arago\Documents\GitHub\habitatmodel-main\studyarea_data\elevation"
+elev9sec_data_extract = r"C:\Users\arago\Documents\GitHub\habitatmodel-main\studyarea_data\elevation"
+elev30sec_data_extract = r"C:\Users\arago\Documents\GitHub\habitatmodel-main\studyarea_data\elevation"
+
+# Defining the full file paths
+elev3sec_zip_path = os.path.join(elev3sec_data, elev3sec_file_name)
+elev5min_zip_path = os.path.join(elev5min_data, elev5min_file_name)
+elev9sec_zip_path = os.path.join(elev9sec_data, elev9sec_file_name)
+elev30sec_zip_path = os.path.join(elev30sec_data, elev30sec_file_name)
+
+# Defining extraction directories without the '.zip' extension
+elev3sec_path = os.path.join(elev3sec_data_extract, elev3sec_file_name.replace(".zip", ""))
+elev5min_path = os.path.join(elev5min_data_extract, elev5min_file_name.replace(".zip", ""))
+elev9sec_path = os.path.join(elev9sec_data_extract, elev9sec_file_name.replace(".zip", ""))
+elev30sec_path = os.path.join(elev30sec_data_extract, elev30sec_file_name.replace(".zip", ""))
+
+# Function to extract ZIP file
+def extract_zip(zip_file_path, extract_to):
+    try:
+        print(f"Extracting {zip_file_path}...")
+        with zipfile.ZipFile(zip_file_path, 'r') as zip_ref:
+            zip_ref.extractall(extract_to)
+        print(f"Contents extracted to: {extract_to}")
+    except zipfile.BadZipFile as e:
+        print(f"Error: The file is not a valid ZIP archive: {e}")
+
+# Step 2: Extract the ZIP files as a list
+for zip_path, extract_path in [
+    (elev3sec_zip_path, elev3sec_path),
+    (elev5min_zip_path, elev5min_path),
+    (elev9sec_zip_path, elev9sec_path),
+    (elev30sec_zip_path, elev30sec_path)
+]:
+    if not os.path.exists(extract_path):  # Check if the extraction directory already exists
+        os.makedirs(extract_path, exist_ok=True)  # Create extraction directory if it doesn't exist
+        extract_zip(zip_path, extract_path)
+    else:
+        print(f"Extracted directory already exists at: {extract_path}")
